@@ -1,0 +1,66 @@
+import { useEffect, useState } from "react";
+
+function App() {
+  const [imageSrc, setImageSrc] = useState("");
+  const [fetching, setFetching] = useState(false);
+  let intervalId = null;
+
+  const initCamera = async () => {
+    try {
+      await fetch("http://localhost:5000/initCamera"); // Call backend to initialize camera
+      setTimeout(() => setFetching(true), 2000); // Wait 2 seconds, then start fetching images
+    } catch (error) {
+      console.error("Error initializing camera:", error);
+    }
+  };
+
+
+  const stopCamera = async () => {
+    try {
+      await fetch("http://localhost:5000/stopCamera");
+      setFetching(false);
+    } catch (error) {
+      console.error("Error stopping camera:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (fetching) {
+      intervalId = setInterval(() => {
+        setImageSrc(`http://localhost:5000/image?t=${new Date().getTime()}`);
+      }, 1000);
+    } else {
+      clearInterval(intervalId);
+    }
+
+    return () => clearInterval(intervalId);
+  }, [fetching]);
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <div style={{ display: "flex", flex: 1 }}>
+        {/* Left half for the image */}
+        <div style={{ width: "50%", background: "#000", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          {imageSrc && <img src={imageSrc} alt="Live Feed" style={{ width: "100%" }} />}
+        </div>
+
+        {/* Right half (empty for now) */}
+        <div style={{ width: "50%", background: "#ddd", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          Right side (empty)
+        </div>
+      </div>
+
+      {/* Start and Stop buttons */}
+      <div style={{ padding: "10px", textAlign: "center" }}>
+        <button onClick={initCamera} disabled={fetching} style={{ margin: "10px", padding: "10px" }}>
+          Start
+        </button>
+        <button onClick={stopCamera} disabled={!fetching} style={{ margin: "10px", padding: "10px" }}>
+          Stop
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default App;

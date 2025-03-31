@@ -1,0 +1,26 @@
+Hi Mike, here is your test assignment.
+
+React Application with Smile Detection
+
+Objective: Develop a small React application that communicates with a backend service to display an image with a detected smile.
+
+Requirements:
+
+    User Interface:
+        Implement a button to start and stop the image capturing process.
+        Ensure the UI updates at least once per second.
+        Display the captured image on the left half of the screen.
+        Show the coordinates of the detected smile on the right half of the screen.
+
+    Backend Integration:
+        Use a Python backend to acquire the image.
+        Add a rectangle around the detected smile on the face.
+        Store successfully detected smiles in files.
+        Persist information about detection events in a database.
+
+Application should not use external services (like Google API). It is fine to use libraries (opencv is OK). 
+Make sure your final result has some tests and instructions.
+
+Please, let me know how much time do you need. 
+
+Thank you!

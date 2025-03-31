@@ -1,0 +1,92 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+const App = () => {
+    const [liveImage, setLiveImage] = useState(null);
+    const [smileList, setSmileList] = useState([]);
+    const [selectedSmile, setSelectedSmile] = useState("");
+    const [smileImage, setSmileImage] = useState(null);
+    const [running, setRunning] = useState(false);
+    const [smileDetected, setSmileDetected] = useState(false);
+
+    // Start Camera
+    const startCamera = async () => {
+        await axios.get("http://localhost:5000/start-camera");
+        setRunning(true);
+    };
+
+    // Stop Camera
+    const stopCamera = async () => {
+        await axios.get("http://localhost:5000/stop-camera");
+        setRunning(false);
+        fetchSmiles();
+    };
+
+    // Fetch live frame
+    useEffect(() => {
+        if (running) {
+        const interval = setInterval(async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/latest-frame", { responseType: "blob" });
+                setLiveImage(URL.createObjectURL(response.data));
+
+                const response2 = await fetch("http://127.0.0.1:5000/detect-smile");
+                const data = await response2.json();
+                setSmileDetected(data.smile_detected);
+
+            } catch (error) {
+                console.error("Failed to fetch frame:", error);
+            }
+        }, 1000);
+      } else {
+        //setImageSrc(""); // Clear image when stopped
+        setSmileDetected(false);
+      }
+
+
+        return () => clearInterval(interval);
+    }, [running]);
+
+    // Fetch past smiles
+    const fetchSmiles = async () => {
+        const response = await axios.get("http://localhost:5000/get-smiles");
+        setSmileList(response.data);
+    };
+
+    // Select past smile
+    const handleSmileSelection = (event) => {
+        const filename = event.target.value;
+        setSelectedSmile(filename);
+        setSmileImage(`http://localhost:5000/get-image/${filename}`);
+    };
+
+    return (
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div style={{ width: "50%" }}>
+                <h2>Live Feed</h2>
+                {liveImage && <img src={liveImage} alt="Live" style={{ width: "100%" }} />}
+                <button onClick={startCamera} disabled={running}>Start</button>
+                <button onClick={stopCamera} disabled={!running}>Stop</button>
+            </div>
+            <div style={{ width: "50%" }}>
+
+                <h2 style={{ color: smileDetected ? "green" : "red" }}>
+                  {smileDetected ? "😊 Smile Detected!" : "😐 No Smile Detected"}
+               </h2>
+
+                <h2>Past Smiles</h2>
+                <select onChange={handleSmileSelection}>
+                    <option value="">Select a past smile</option>
+                    {smileList.map((smile) => (
+                        <option key={smile.timestamp} value={smile.filename}>
+                            {smile.timestamp}
+                        </option>
+                    ))}
+                </select>
+                {smileImage && <img src={smileImage} alt="Smile" style={{ width: "100%" }} />}
+            </div>
+        </div>
+    );
+};
+
+export default App;
