@@ -1,16 +1,22 @@
+# How to Setup 
+
+git clone https://github.com/miketanona/SmileApp.git
+
 # Frontend  REACT 
 
-cd to react-python-image-stream\frontend> 
+cd to react-python-image-stream\frontend
 
-run: npm start
+npm install
+
+npm start
 
 # Backend Python
 
 cd backend
 
-run: pip install -r requirements.txt
+pip install -r requirements.txt
 
-run: python server.py
+python server.py
 
 
 
