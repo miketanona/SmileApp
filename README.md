@@ -1,10 +1,10 @@
-# Front End  REACT 
+# Frontend  REACT 
 
 cd to react-python-image-stream\frontend> 
 
 run: npm start
 
-# B kend Python
+# Backend Python
 
 cd backend
 
